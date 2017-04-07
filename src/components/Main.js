@@ -19,6 +19,15 @@ var imageDatas =  (function (imageDataArr){
 })(imageDataArr);
 
 /**
+ * 随机范围内的角度值
+ * @param angle 角度范围
+ * @returns {string}
+ */
+function get3DRandom(angle){
+  return (Math.random > 0.5 ? '' : '-') + (Math.ceil(Math.random() * angle));
+}
+
+/**
  * 获取范围内的随机值
  */
 function getRangeRandom (floor,upper){
@@ -26,7 +35,9 @@ function getRangeRandom (floor,upper){
   return randomValue;
 }
 
-//主组件
+/**
+ * 舞台组件
+ */
 class AppComponent extends React.Component {
   Constant =  {
   //中心图片取值
@@ -50,15 +61,15 @@ class AppComponent extends React.Component {
     super(props);
     this.state = {
       imgArr:[
-        /*{
+        {
          pos: {
          left: '0',
          top: '0'
          },
-         rotate: 0,    // 旋转角度
-         isInverse: false,    // 图片正反面
-         isCenter: false,    // 图片是否居中
-         }*/
+         rotate: 0   // 旋转角度
+         // isInverse: false,    // 图片正反面
+         // isCenter: false,    // 图片是否居中
+         }
       ]
     };
   }
@@ -84,10 +95,12 @@ class AppComponent extends React.Component {
       topImg = imgArr.splice(topImgIndex, topImgNum);
     //如果有顶部图片
     if (topImg) {
+      //设置位置信息
       topImg[0].pos = {
         top: getRangeRandom(this.Constant.vPosRange.topY[0], this.Constant.vPosRange.topY[1]),
         left: getRangeRandom(this.Constant.vPosRange.x[0], this.Constant.vPosRange.x[1])
       };
+      topImg[0].rotate = get3DRandom(30);
     }
 
     //设置左右两边图片
@@ -102,7 +115,8 @@ class AppComponent extends React.Component {
       imgArr[i].pos = {
         top: getRangeRandom(this.Constant.hPosRange.y[0], this.Constant.hPosRange.y[1]),
         left: getRangeRandom(hPosRangeLOR[0], hPosRangeLOR[1])
-      }
+      };
+      imgArr[i].rotate = get3DRandom(30);
     }
 
     //--------start 合并数据信息-------------
@@ -190,6 +204,12 @@ class ImgFigure  extends  React.Component{
     // 如果props属性中指定了这张图片的位置，则使用
     if (this.props.arrange.pos) {
       styleObj = this.props.arrange.pos;
+    }
+    if (this.props.arrange.rotate){
+      //使旋转兼容所有浏览器
+      (['Moz','Webkit','ms','']).forEach(function(value){
+        styleObj[value + 'Transform'] = 'rotate(' +  this.props.arrange.rotate + 'deg)';
+      }.bind(this));
     }
     return (
       <figure className="img-figure" style={styleObj}>
